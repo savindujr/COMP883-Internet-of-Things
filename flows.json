@@ -1,0 +1,271 @@
+[
+    {
+        "id": "859b848abd5c2ae7",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "e9ec317cbd838369",
+        "type": "rpi-sensehat in",
+        "z": "859b848abd5c2ae7",
+        "name": "",
+        "motion": false,
+        "env": true,
+        "stick": false,
+        "x": 370,
+        "y": 360,
+        "wires": [
+            [
+                "af973c8c39bb7cce"
+            ]
+        ]
+    },
+    {
+        "id": "1cae96e17c321e18",
+        "type": "inject",
+        "z": "859b848abd5c2ae7",
+        "name": "timestamp",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 370,
+        "y": 200,
+        "wires": [
+            [
+                "af973c8c39bb7cce"
+            ]
+        ]
+    },
+    {
+        "id": "af973c8c39bb7cce",
+        "type": "function",
+        "z": "859b848abd5c2ae7",
+        "name": "function with cpu",
+        "func": "let cpuTemp = flow.get('cpuTemp') || 0;\nlet rawTemp = msg.payload.temperature;\n\nlet calibratedTemp = rawTemp - 18;\n\nmsg.payload = [\n    {\n        temperature: Math.round(calibratedTemp * 10) / 10,\n        humidity: Math.round(msg.payload.humidity * 10) / 10,\n        pressure: Math.round(msg.payload.pressure * 10) / 10\n    },\n    {\n        device: \"raspberrypi-sensehat\",\n        location: \"Auckland\"\n    }\n];\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 280,
+        "wires": [
+            [
+                "6da18b7fcd42431a",
+                "b3336891a46cc683"
+            ]
+        ]
+    },
+    {
+        "id": "6da18b7fcd42431a",
+        "type": "mqtt out",
+        "z": "859b848abd5c2ae7",
+        "name": "",
+        "topic": "weather/temperature",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "5eb2d4900585b0d9",
+        "x": 920,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "64515ca85f0867b1",
+        "type": "inject",
+        "z": "859b848abd5c2ae7",
+        "name": "Inject CPU  Time",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 390,
+        "y": 560,
+        "wires": [
+            [
+                "69f92213288c5e64"
+            ]
+        ]
+    },
+    {
+        "id": "69f92213288c5e64",
+        "type": "exec",
+        "z": "859b848abd5c2ae7",
+        "command": "cat /sys/class/thermal/thermal_zone0/temp",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Read CPU Temp",
+        "x": 610,
+        "y": 560,
+        "wires": [
+            [],
+            [
+                "dbb70352968f14f1"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "dbb70352968f14f1",
+        "type": "function",
+        "z": "859b848abd5c2ae7",
+        "name": "Convert CPU Temp",
+        "func": "let cpuTempRaw = parseInt(msg.payload.trim());\nmsg.payload = cpuTempRaw / 1000.0;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 560,
+        "wires": [
+            [
+                "344bf39e3875754e"
+            ]
+        ]
+    },
+    {
+        "id": "344bf39e3875754e",
+        "type": "function",
+        "z": "859b848abd5c2ae7",
+        "name": "Store CPU Temp",
+        "func": "flow.set('cpuTemp', msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1050,
+        "y": 560,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b3336891a46cc683",
+        "type": "influxdb out",
+        "z": "859b848abd5c2ae7",
+        "influxdb": "6f41fe68c512303a",
+        "name": "InfluxDB",
+        "measurement": "environment",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "organisation",
+        "bucket": "bucket",
+        "x": 880,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "5eb2d4900585b0d9",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "comitup-101",
+        "port": "8883",
+        "tls": "729711f5d1b2e04f",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "6f41fe68c512303a",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": 8086,
+        "protocol": "http",
+        "database": "weatherdb",
+        "name": "influxdb-local",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "1.x",
+        "url": "http://localhost:8086",
+        "timeout": 10,
+        "rejectUnauthorized": true
+    },
+    {
+        "id": "729711f5d1b2e04f",
+        "type": "tls-config",
+        "name": "mosquitto-tls",
+        "cert": "",
+        "key": "",
+        "ca": "/etc/mosquitto/certs/ca.crt",
+        "certname": "",
+        "keyname": "",
+        "caname": "",
+        "servername": "",
+        "verifyservercert": true,
+        "alpnprotocol": ""
+    },
+    {
+        "id": "ee39b9f8520578dc",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-node-pi-sense-hat": "0.2.0",
+            "node-red-contrib-influxdb": "0.7.0"
+        }
+    }
+]
