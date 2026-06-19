@@ -479,7 +479,6 @@ Run `forecast.py` manually once to refresh forecast data, then open Grafana.
 
 ## Credits
 
-- Student: Savindu Rajapaksha — Master of Applied Technologies, Unitec Institute of Technology
+- Student: Savindu Ranasinghe — Master of Applied Technologies, Unitec Institute of Technology
 - Course: COMP8832 Internet of Things
-- Supervisor: Dr Russel Mesbah
 - Data source: [OpenWeatherMap](https://openweathermap.org)
