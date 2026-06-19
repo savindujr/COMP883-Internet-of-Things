@@ -288,8 +288,8 @@ cd ~/comp8832-weather-forecast
 Verify data in InfluxDB:
 
 ```bash
-influx -database weatherdb -execute 'SELECT * FROM forecast ORDER BY time DESC LIMIT 3'
-influx -database weatherdb -execute 'SELECT * FROM current ORDER BY time DESC LIMIT 1'
+influx -database weatherdb -execute 'SELECT * FROM forecast ORDER BY time DESC LIMIT 5'
+influx -database weatherdb -execute 'SELECT * FROM current ORDER BY time DESC LIMIT 5'
 ```
 
 ---
@@ -327,7 +327,6 @@ crontab -l
    - Query language: InfluxQL
    - URL: `http://localhost:8086`
    - Database: `weatherdb`
-   - Version: 1.x
 4. Save and Test
 
 ### Dashboard 1 — IoT Live Weather (6 gauges)
@@ -479,6 +478,6 @@ Run `forecast.py` manually once to refresh forecast data, then open Grafana.
 
 ## Credits
 
-- Student: Savindu Ranasinghe - Master of Applied Technologies, Unitec Institute of Technology
+- Student: Savindu Ranasinghe 
 - Course: COMP8832 Internet of Things
 - Data source: [OpenWeatherMap](https://openweathermap.org)
